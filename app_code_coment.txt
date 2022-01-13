@@ -1,0 +1,144 @@
+//_ function GetRandomFloat(min: number, max: number): number {
+return Math.random() _ (max - min) + min;
+}
+
+function GetRandomInt(min: number, max: number): number {
+return Math.floor(GetRandomFloat(min, max)); // function returns the largest integer less than or equal to a given numbe
+}
+
+function FromPolar(v: number, theta: number) {
+return [v * Math.cos(theta), v * Math.sin(theta)]; // static function returns the cosine of the specified angle,
+}
+
+// interface => all objects including and simulation
+
+interface IsimObject {
+Update(): void; // update => update state object
+Draw(ctx: CanvasRenderingContext2D): void; // render object
+}
+
+const MaxParticleSize = 3;
+
+// Structure Model Particle
+
+class Particle implements IsimObject {
+x = 0;
+y = 0; // location
+speed = 0;
+theta = 0; // velocity
+radius = 1.5; // size particle
+ttl = 500; // time to live
+lifetime = 500; // lifetime
+color = "black";
+constructor(private w: number, private h: number, private palette:string[]) {
+this.x = GetRandomFloat(0, w);
+this.y = GetRandomFloat(0, h);
+
+        this.speed = GetRandomFloat(0, 3.0);
+        this.theta = GetRandomFloat(0, 2 * Math.PI);
+
+        this.radius = GetRandomFloat(0.05, MaxParticleSize);
+        this.lifetime = this.ttl = GetRandomFloat(25, 50);
+
+        this.color= palette[GetRandomInt(0, palette.length)]
+    }
+
+    // Move particles
+    Update() {
+
+        // delta => changes variables
+
+        let dRadius = GetRandomFloat(-MaxParticleSize/10, MaxParticleSize/10)
+        const dSpeed = GetRandomFloat(-0.01, 0.01);
+        const dTheta = GetRandomFloat(-Math.PI /8, Math.PI /8);
+
+
+        // new values
+        this.speed += dSpeed
+        this.theta += dTheta
+
+        const [dx, dy] = FromPolar(this.speed, this.theta);
+        this.x += dx;
+        this.y += dy;
+        this.radius += dRadius;
+
+        this.radius += (this.radius < 0) ? - 2 * dRadius : 0; // radius positive
+    }
+
+    Draw(ctx: CanvasRenderingContext2D) {
+        ctx.save();
+
+        this.experiment1(ctx);
+
+        ctx.restore();
+    }
+    experiment1(ctx: CanvasRenderingContext2D) {
+        ctx.fillStyle = this.color;
+        let circle = new Path2D();
+        circle.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx.fill(circle);
+    }
+
+}
+const ParticleCount = 200;
+
+const ColorPalettes = [["03C4A1", "A13333", "FEC260", "#FFFDDE", "FF5DA2",],
+                        ["B5DEFF", "#CFFFDC", "DD4A48", "FFA6D5", "#F90716",]]
+
+/_class Simulation implements IsimObject {
+particles: Particle[] = [];
+palette:string[]=[];
+constructor(private width: number, private height: number) {
+this.palette = ColorPalettes[GetRandomInt(0,ColorPalettes.length)]; // palette Random
+for (let i = 0; i < ParticleCount; i++) {
+this.particles.push(new Particle(this.width, this.height, this.palette));_/
+}
+}
+// implement
+Update() {
+this.particles.forEach(p => p.Update())
+}
+
+    init = false
+    // implement
+    Draw(ctx: CanvasRenderingContext2D) {
+        if (!this.init) {
+            ctx.fillStyle = this.palette[0] //  "blue"; background color
+            ctx.fillRect(0, 0, this.width, this.height);
+            this.init = true
+        }
+        this.particles.forEach((p) => p.Draw(ctx)); // particles color
+    }
+
+}
+
+// Model - Template
+function bootstrapper() {
+const widht = 400;
+const height = 400;
+
+    const updateFrameRate = 50;
+    const renderFrameRate = 50;
+    const canvas = document.createElement("canvas");
+    document.body.appendChild(canvas);
+    if (!canvas) return;
+    canvas.width = widht;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = "high";
+
+    const sim = new Simulation(widht, height);
+
+    setInterval(() => {
+        sim.Update();
+    }, 1000 / updateFrameRate);
+
+    setInterval(() => {
+        sim.Draw(ctx);
+    }, 1000 / renderFrameRate);
+
+}
+
+bootstrapper();*/
